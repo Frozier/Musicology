@@ -1,4 +1,3 @@
 # Musicology
 
-Groups to include in the music analysis (geographic region):
-RADWIMPS, The Script, ONE OK ROCK and Day6
+The corpus is a playlist of songs picked from various bands from different countries/regions in the world. The bands that are included are RADWIMPS, The Script, ONE OK ROCK and Day6. The songs are picked such that they all follow somewhat the same trend in terms of genre, namely pop, instead of mixing it with genres like heavy metal. Apart from the regional differences, there are other interesting things about the included songs. RADWIMPS and ONE OK ROCK for example are both bands that originate from Japan, however one of them has western influences such as mainly singing in English, and the other has some songs that are written for films, though they all have vocals and still follow a similar genre as the other bands. The Script is an Irish band that writes pop music and Day6 originates from Korea. For the purposes of this project we're analysing music mainly based on geographic location.
