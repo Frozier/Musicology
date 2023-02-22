@@ -8,9 +8,17 @@ output:
 ### K-pop, J-pop and Western
 
 ```{r}
+#source('dependencies.R')
+library(ggplot2)
+library(tidyverse)
+library(spotifyr)
+musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ")
+ggplot(musicology, aes(track.popularity, valence, color = energy)) +
+  geom_point() +
+  labs(title = "Valence versus track popularity", y = "Valence", x = "Track popularity")
 ```
 
-Is this where you type stuff?
+# Is this where you type stuff?
 
 ### Differences between western and eastern music
 
