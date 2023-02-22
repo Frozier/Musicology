@@ -18,7 +18,6 @@ ggplot(musicology, aes(track.popularity, valence, color = energy)) +
   labs(title = "Valence versus track popularity", y = "Valence", x = "Track popularity")
 ```
 
-# Is this where you type stuff?
 
 ### Differences between western and eastern music
 
