@@ -8,18 +8,16 @@ output:
 ### K-pop, J-pop and Western
 
 ```{r}
-#source('dependencies.R')
 library(ggplot2)
 library(tidyverse)
 library(spotifyr)
 library(extrafont)
-#font_import()
-#loadfonts(dev = "win")
+# Change to Georgia font family pls
 musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
   mutate(artist.name = map_chr(track.artists, function(x) x$name[1]))
 ggplot(musicology, aes(energy, danceability, color = artist.name)) +
   geom_point(size = 5, alpha = 0.4) +
-  theme(text = element_text(family = "Georgia", color = "Gray25")) +
+  theme(text = element_text(family = "Bookman", color = "Gray25")) +
   labs(title = "Artists show different distributions in energy and danceability",
        y = "Danceability", 
        x = "Energy",
