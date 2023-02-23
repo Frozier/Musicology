@@ -12,10 +12,18 @@ output:
 library(ggplot2)
 library(tidyverse)
 library(spotifyr)
-musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ")
-ggplot(musicology, aes(track.popularity, valence, color = energy)) +
-  geom_point() +
-  labs(title = "Valence versus track popularity", y = "Valence", x = "Track popularity")
+library(extrafont)
+#font_import()
+#loadfonts(dev = "win")
+musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
+  mutate(artist.name = map_chr(track.artists, function(x) x$name[1]))
+ggplot(musicology, aes(energy, danceability, color = artist.name)) +
+  geom_point(size = 5, alpha = 0.4) +
+  theme(text = element_text(family = "Georgia", color = "Gray25")) +
+  labs(title = "Artists show different distributions in energy and danceability",
+       y = "Danceability", 
+       x = "Energy",
+       subtitle = "The Script shows a lot of diversity")
 ```
 
 
