@@ -1,0 +1,127 @@
+---
+title: "Storyboard"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    orientation: rows
+---
+
+### K-pop, J-pop and Western
+
+#### Tracks description
+
+The corpus is a playlist of songs picked from various bands from different countries/regions in the world. I chose this corpus because I wanted to learn more about the differences in music styles from different regions. The bands that are included are RADWIMPS, The Script, ONE OK ROCK and Day6.
+
+The songs are picked such that they all follow somewhat the same trend in terms of genre, namely pop (rock), instead of mixing it with genres such as heavy metal. Apart from the regional differences, there are other interesting things about the included songs. RADWIMPS and ONE OK ROCK for example are both bands that originate from Japan, however one of them has western influences such as mainly singing in English, and the other has some songs that are written for films, though they all have vocals and still follow a similar genre as the other bands. The Script is an Irish band and Day6 originates from South-Korea.
+
+Even though bands and artists from different regions in the world can write music in similar genres, their music styles are often considered to be noticeably different, and artists themselves may be very aware of this. One example is how the vocals are used for the melodies, or the difference in instrumentation. For the purposes of this project we’re analyzing music mainly based on geographic location and how music styles differ or resemble.
+
+### Overall 'feel' of the different tracks
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(spotifyr)
+library(extrafont)
+library(plotly)
+# Change to Georgia font family pls
+musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
+  mutate(artist.name = map_chr(track.artists, function(x) x$name[1])) %>%
+  mutate(valence_factor = round(valence))
+```
+
+```{r fig.cap=4}
+# plot with energy and danceability
+energy_dance <- ggplot(musicology, aes(energy, danceability, color = artist.name)) +
+  geom_point(size = 5, alpha = 0.4) +
+  theme(text = element_text(family = "Bookman", color = "Gray25")) +
+  labs(title = "Artists show different distributions in energy and danceability",
+       y = "Danceability", 
+       x = "Energy",
+       subtitle = "The Script shows a lot of diversity") +
+  guides(color = guide_legend(title = "Artist"))
+energy_dance
+#ggplotly(energy_dance) %>%
+#  layout(showlegend = TRUE)
+```
+
+***
+When we analyze the danceability and energy of the tracks, there are noticeable differences between each of the artists. Notice that the figure shown here is limited in the axis as all the tracks group well within the current ranges.
+
+For this analysis, The Script takes it all. Many of their tracks are spread between low and high energy _and_ danceability, thus showing a lot of variation. RADWIMPS skews towards a not-too-high-not-too-low danceability and energy whereas ONE OK ROCK shows much higher energy levels. These difference in energy between the two artists may stem from the genre, where ONE OK ROCK, as the name implies, plays many rock songs unlike RADWIMPS does. The danceability between them are similar however.
+
+Day6 follows a line with low energy and danceability in their tracks, to tracks with high levels in both.
+
+
+
+### Differences between western and eastern music
+
+```{r}
+musicology |>                    # All tracks
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = ""
+    ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = -0.05,          # Nudge the label slightly left.
+    nudge_y = 0.02            # Nudge the label slightly up.
+  ) +
+  facet_wrap(~artist.name) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Paired"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    title = "Positivity between artists",
+    x = "Valence",
+    y = "Energy",
+    colour = "Mode"
+  )
+```
+
+***
+Many of the artists choose for a major modality in their tracks, with DAY6 showing more of the minor kind. Furthermore the loudness seem to be similar across all artists, but we now have valence which does differ for each.
+
+In this case The Script again shows a lot of variation in valence, but RADWIMPS and ONE OK ROCK skew more toward lower valence, although their tracks with higher valence are also noticeably louder. DAY6 shows a similar trend, and it may point to these three artists being similar because they are in the same continent, whereas The Script is on the other side of the world.
+
+### What makes each region's music unique
+
+```{r}
+```
+
+A lot can differ in music from different regions of the world, but similarities also show a good resemblance between artists and their music, and it makes it easier to judge what really makes the difference. We've seen that some artists prefer composing songs in major, and one in minor. We've also seen how valence, energy and danceability show different variations in each artist (which may point to the major differences!). What we can analyze with the available data is however quite limited; plently of features didn't show interesting numbers that affect how we see the music, and we don't have features with song structure and rhythm.
+
+This conclusion/discussion page is still a work in progress
