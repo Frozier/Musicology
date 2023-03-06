@@ -1,6 +1,6 @@
 ---
 title: "Storyboard"
-output: 
+output:
   flexdashboard::flex_dashboard:
     storyboard: true
     orientation: rows
@@ -72,9 +72,8 @@ energy_dance <- ggplot(musicology, aes(energy, danceability, color = artist.name
        x = "Energy",
        subtitle = "The Script shows a lot of diversity") +
   guides(color = guide_legend(title = "Artist"))
-energy_dance
-#ggplotly(energy_dance)
-#  layout(showlegend = TRUE)
+#energy_dance
+ggplotly(energy_dance)
 ```
 
 ***
@@ -149,7 +148,46 @@ Many of the artists choose for a major modality in their tracks, with DAY6 showi
 
 In this case The Script again shows a lot of variation in valence, but RADWIMPS and ONE OK ROCK skew more toward lower valence, although their tracks with higher valence are also noticeably louder. DAY6 shows a similar trend, and it may point to these three artists being similar because they are in the same continent, whereas The Script is on the other side of the world.
 
-### Chromogram of the outlier (We'll Be Alright)
+### DTW between similar songs
+
+```{r}
+## The Tallis Scholars
+science_faith <-
+  get_tidy_audio_analysis("0cnouzAiEjdjXB5xVVQ8Vo") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+## La Chapelle Royale
+wasted_nights <-
+  get_tidy_audio_analysis("39LyUQIy7idLxPdsjyZsxe") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+
+compmus_long_distance(
+  science_faith |> mutate(pitches = map(pitches, compmus_normalise, "chebyshev")),
+  wasted_nights |> mutate(pitches = map(pitches, compmus_normalise, "chebyshev")),
+  feature = pitches,
+  method = "euclidean"
+) |>
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_equal() +
+  labs(x = "Science & Faith", y = "Wasted Nights", title = "Dynamic Time Warping between two songs similar in energy and Danceability") +
+  theme_minimal() +
+  scale_fill_viridis_c(guide = NULL)
+```
+
+### Chromogram of We'll Be Alright
 
 ```{r}
 alright <-
@@ -157,6 +195,26 @@ alright <-
   select(segments) |>
   unnest(segments) |>
   select(start, duration, pitches)
+
+alright_timbre <-
+  get_tidy_audio_analysis("7vSF7u4vWtZGrWCxTbAVaw") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
 ```
 
 ```{r}
@@ -177,7 +235,26 @@ alright |>
   scale_fill_viridis_c()
 ```
 
-### Self Matrix
+### Timbregram of We'll Be Alright
+
+```{r}
+alright_timbre |>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+
+### Cepstrogram
 
 ```{r}
 compmus_long_distance(
@@ -202,7 +279,8 @@ compmus_long_distance(
   scale_fill_viridis_c(guide = NULL)
 ```
 
-######## MAAK OOK EEN CHROMOGRAM VAN WE'LL BE ALRIGHT
+***
+Cepstrogram shows something very interesting. There is nearly no similarity between any of the parts within the song!
 
 
 Conclusion {.storyboard}
