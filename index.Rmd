@@ -63,10 +63,16 @@ Analyses {.storyboard}
 ### Overall 'feel' of the different tracks
 
 ```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(spotifyr)
+library(extrafont)
+library(plotly)
+library(compmus)
 # Change to Georgia font family pls
 musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
-  mutate(artist.name = map_chr(track.artists, function(x) x$name[1])) %>%
-  mutate(valence_factor = round(valence))
+  mutate(artist.name = map_chr(track.artists, function(x) x$name[1]))
 ```
 
 ```{r}
@@ -517,6 +523,52 @@ pop |>
 
 ***
 description is in the works
+
+
+### Histogram of tempi for different groups
+
+```{r}
+musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
+  mutate(artist.name = map_chr(track.artists, function(x) x$name[1]))
+
+tempigram <- ggplot(musicology, aes(tempo, color = artist.name)) +
+  geom_histogram(fill = "Black") +
+  facet_wrap(~artist.name) +
+  theme_classic()
+
+ggplotly(tempigram)
+```
+***
+
+Analysis in the works, enjoy the plot for now.
+
+
+### outliers in tempo
+
+```{r}
+zenzen <- get_tidy_audio_analysis("57Hk29LVcJAaGSFYQSuOKM")
+alright <- get_tidy_audio_analysis("7vSF7u4vWtZGrWCxTbAVaw")
+beginning <- get_tidy_audio_analysis("4f3nDjgqXurMryYBSp0TZD")
+somebody <- get_tidy_audio_analysis("4aceMabp5rzZYoKKXsUffr")
+  
+tempi <-
+  zenzen |>
+  mutate(track = "Zenzenzense") |>
+  bind_rows(alright |> mutate(track = "We'll Be Alright")) |>
+  bind_rows(beginning |> mutate(track = "The Beginning")) |>
+  bind_rows(somebody |> mutate(track = "누군가 필요해 I Need Somebody"))
+
+somebody |>
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
+```
+
+***
+It's quite common to see slow songs on music streaming platforms, but what about songs with a tempo of over 190 BPM? As it happens, RADWIMPS has two songs around that tempo of which one of them is again We'll Be Alright, and the other Zenzenzense. ONE OK ROCK and Day6 also have a couple songs at very high BPM, namely, The Beginning and 누군가 필요해 I Need Somebody. Let's take a look at their tempograms. (NOTE: unfinished, need to use some kind of facet wrap >_<)
 
 
 Conclusion {.storyboard}
