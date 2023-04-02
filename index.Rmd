@@ -34,12 +34,16 @@ item.active, .list-group-item.active:hover {
 </style>
 
 ```{r libraries, message=FALSE, echo=FALSE}
+library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(spotifyr)
 library(extrafont)
 library(plotly)
 library(compmus)
+#library(tidymodels)
+#library(ggdendro)
+#library(heatmaply)
 ```
 
 Introduction {.storyboard}
@@ -60,16 +64,9 @@ Analyses {.storyboard}
 ========================================
 
 
-### Overall 'feel' of the different tracks
+### Overall 'feel' of all the tracks
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(tidyverse)
-library(spotifyr)
-library(extrafont)
-library(plotly)
-library(compmus)
 # Change to Georgia font family pls
 musicology <- get_playlist_audio_features("", "4qytaIOVyWpUF2ncTXkjLZ") %>%
   mutate(artist.name = map_chr(track.artists, function(x) x$name[1]))
@@ -96,9 +93,9 @@ For this analysis, The Script takes it all. Many of their tracks are spread betw
 
 Day6 follows a line with low energy and danceability in their tracks, to tracks with high levels in both.
 
+<iframe src="https://open.spotify.com/embed/playlist/4qytaIOVyWpUF2ncTXkjLZ?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" data-external="1"></iframe>
 
-
-### Differences between western and eastern music
+### Differences between Western and Eastern music
 
 ```{r}
 musicology |>                    # All tracks
@@ -161,7 +158,9 @@ Many of the artists choose for a major modality in their tracks, with DAY6 showi
 
 In this case The Script again shows a lot of variation in valence, but RADWIMPS and ONE OK ROCK skew more toward lower valence, although their tracks with higher valence are also noticeably louder. DAY6 shows a similar trend, and it may point to these three artists being similar because they are in the same continent, whereas The Script is on the other side of the world.
 
-### DTW between similar songs
+<iframe src="https://open.spotify.com/embed/playlist/4qytaIOVyWpUF2ncTXkjLZ?utm_source=generator" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" data-external="1"></iframe>
+
+### Dynamic Time Warping (DTW) between similar songs
 
 ```{r}
 ## The Tallis Scholars
@@ -279,10 +278,14 @@ alright_timbre |>
 ```
 
 ***
-In the timbregram for We'll Be Alright we can see a dominance in magnitude toward pitches c01-c03. This is vastly different from the chromagram.
+In the timbregram for We'll Be Alright we can see a dominance in magnitude toward pitches c01-c03. c02 has strong emphasis on certain timestamps while being present through the entire song otherwise. It's tricky to pinpoint the variations in the song. But in the case of c02, the timestamps where this is dominant is when the orchestral segments kick in, at 100, 190 and at 300 seconds when the outro happens.
+
+```{=html}
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7vSF7u4vWtZGrWCxTbAVaw?utm_source=generator&theme=0" width="100%" height="100" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" data-external="1"></iframe>
+```
 
 
-### Self-Similarity Matrices
+### Self-Similarity Matrices of We'll Be Alright
 
 ```{r hazes}
 alright <-
@@ -337,7 +340,11 @@ Naturally you'd expect songs in general to show some level of similarity, or rat
 
 On one hand it's unwise to identify it as an outlier since it still has strong pop music themes. On the other hand it's also an outlier of RADWIMPS themselves, and it's hardly representative for what their music is generally like. However that's something to look for in a manual analysis too.
 
-### Chordogram
+```{=html}
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7vSF7u4vWtZGrWCxTbAVaw?utm_source=generator&theme=0" width="100%" height="100" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" data-external="1"></iframe>
+```
+
+### Chordogram of We'll Be Alright
 
 ```{r}
 circshift <- function(v, n) {
@@ -458,8 +465,12 @@ alright |>
 ***
 Here we have a chordogram of the song We'll Be Alright. There's notably something interesting happening later on in the song. For the most part the chords look consistent. But if you listen to the time frame at around 200 seconds into the song, you will hear a very short change in key. In fact it changes twice there and serves as an embellishment.
 
+```{=html}
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/7vSF7u4vWtZGrWCxTbAVaw?utm_source=generator&theme=0" width="100%" height="100" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" data-external="1"></iframe>
+```
 
-### Variation (standard deviation)
+
+### Variation in different features for all tracks
 
 ```{r}
 RADWIMPS <-
@@ -522,7 +533,7 @@ pop |>
 ```
 
 ***
-description is in the works
+Here we have a plot with some advanced metrics. First if we look at RADWIMPS, we can see that many of their songs are higher in duration than other artists do. Songs that are higher in tempo seem to also have a higher standard deviation in tempo. In the section where we show tempograms you will see why this is the case. As for the other metrics, volume, mean tempo and loudness, they're quite balanced for each artist. You could say that they show a similar level of variation, at the same time the tracks aren't very unique in these metrics. However we will take a closer look at the different tempi as there are different distributions going on there.
 
 
 ### Histogram of tempi for different groups
@@ -539,13 +550,14 @@ tempigram <- ggplot(musicology, aes(tempo, color = artist.name)) +
 ggplotly(tempigram)
 ```
 ***
+Here's a histogram showing the tempo of each track for every artist. Each artist clearly varies their tempo in their songs, and there isn't much significant to note in terms of how the tempi differ between the different artists. The Script has the majority of their songs at around 100 BPM while all the other artists don't show a particular preference. As you may notice, some tracks have a very high tempo (around 180 BPM). In the next section we'll explore some of these high tempo songs.
 
-Analysis in the works, enjoy the plot for now.
 
-
-### outliers in tempo
+### outliers in tempo - and their tempograms
 
 ```{r}
+par(mfrow=c(2,2))
+
 zenzen <- get_tidy_audio_analysis("57Hk29LVcJAaGSFYQSuOKM")
 alright <- get_tidy_audio_analysis("7vSF7u4vWtZGrWCxTbAVaw")
 beginning <- get_tidy_audio_analysis("4f3nDjgqXurMryYBSp0TZD")
@@ -558,17 +570,56 @@ tempi <-
   bind_rows(beginning |> mutate(track = "The Beginning")) |>
   bind_rows(somebody |> mutate(track = "누군가 필요해 I Need Somebody"))
 
+
 somebody |>
   tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
   ggplot(aes(x = time, y = bpm, fill = power)) +
   geom_raster() +
   scale_fill_viridis_c(guide = "none") +
-  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  labs(x = "Time (s)", y = "Tempo (BPM)",
+       title = "누군가 필요해 I Need Somebody (Day6)") +
+  theme_classic()
+
+
+zenzen |>
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)",
+       title = "Zenzenzense (RADWIMPS)") +
+  theme_classic()
+
+alright |>
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)",
+       title = "We'll Be Alright (RADWIMPS)") +
+  theme_classic()
+
+beginning |>
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)",
+       title = "The Beginning (ONE OK ROCK)") +
   theme_classic()
 ```
 
 ***
-It's quite common to see slow songs on music streaming platforms, but what about songs with a tempo of over 190 BPM? As it happens, RADWIMPS has two songs around that tempo of which one of them is again We'll Be Alright, and the other Zenzenzense. ONE OK ROCK and Day6 also have a couple songs at very high BPM, namely, The Beginning and 누군가 필요해 I Need Somebody. Let's take a look at their tempograms. (NOTE: unfinished, need to use some kind of facet wrap >_<)
+It's quite common to see slow songs on music streaming platforms, but what about songs with a tempo of over 190 BPM? As it happens, RADWIMPS has two songs around that tempo of which one of them is again We'll Be Alright, and the other Zenzenzense. ONE OK ROCK and Day6 also have a couple songs at very high BPM, namely, The Beginning and 누군가 필요해 I Need Somebody respectively. Let's take a look at their tempograms.
+
+One thing you might notice is that The Beginning has a tempo that is very consistent throughout the song, and there is not much to observe other than the small spike at around 20 seconds. When listening to the song you'll find that it happens around the beginning of the transition from intro to verse, and it may feel like a 'kick start' into the song.
+
+I Need Somebody is quite similar, but a lot more is going on at the start. In reality the tempogram might just be getting confused here; to a human one constant tempo is easily heard, but the beats are not consistent which may explain the plot. Otherwise the rest of the song seems to have a fixed tempo.
+
+Both of the songs by RADWIMPS show interesting tempograms. While there is a clear consistent tempo present (shown by the long yellow line), the tempo also seems to be all over the place. For Zenzenzense this makes sense, there are a lot of small variations in rhythm even throughout the same segments in the song while the tempo stays the same. Ironically, likely because of this the song's danceability is relatively low, while its energy is very high as it's an up-beat song. The song We'll Be Alright is not nearly the same in this aspect, but still shows a similar all-over-the-place distribution of the tempo. This is a bit more difficult to explain however, it's not exactly rich in rhythm variation but rather it's rich in variation of everything; The song starts with simple guitar strums and singing, but it keeps switching to segments that either: transition to busier segments, change the entire instrumentation along with the rhythm through repeated segments (first and second chorus for example) or switch to a segment that's entirely orchestral or a mix with non-orchestral instruments. Given the other few plots we've seen about We'll Be Alright it makes sense to consider this song more of an outlier despite its popularity.
+
+One last thing to note is that despite Spotify labeling these songs with very high tempo, the tempograms seem to show a different story; according to the plots the tempi are around 90 to 100 BPM instead of the Spotify-labeled 170 to 190 BPM.
+
 
 
 Conclusion {.storyboard}
@@ -582,4 +633,6 @@ Conclusion {.storyboard}
 
 A lot can differ in music from different regions of the world, but similarities also show a good resemblance between artists and their music, and it makes it easier to judge what really makes the difference. We've seen that some artists prefer composing songs in major, and one in minor. We've also seen how valence, energy and danceability show different variations in each artist (which may point to the major differences!). What we can analyze with the available data is however quite limited; plently of features didn't show interesting numbers that affect how we see the music, and we don't have features with song structure and rhythm.
 
-This conclusion/discussion page is still a work in progress
+We have however explored chrome, chord-and timbregrams as well as analysed the tempo for different tracks. And it's interesting to see that what we see in these advanced plots also can be heard back in the respective songs, which shows how each track is unique in its visualization rather than just telling by hearing. We've also explored advanced metrics such as standard deviation and it shows interesting but also similar distributions between each artist.
+
+As for how different artists from different regions in the world are unique in their culture, it may be a bit difficult to tell from only a few artists. It's a wise choice to pick some of the popular groups, as that will represent most of the population of the respective countries (or audience). But the challenge comes when all the artists show major similarities in for example genre and instrumentation as they bring noise to our analysis when we are actually trying to find clear trends in each region. Nevertheless, while popular artist represent a larger audience, the same artists can also have similar audiences, which is one thing we couldn't distinguish for; we know plenty about the tracks thanks to Spotify's data, however in a future work it may be insightful to analyse the audience as well, for example through machine learning methods such as clustering. There's a good chance that perhaps what each region in the world tends to listen to actually do so because of the things all artists have in common, and it may no longer be a regional preference to music but person to person. All the music in the world is after all accessible through almost any music streaming platform.
